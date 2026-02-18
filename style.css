@@ -174,14 +174,14 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            overflow-y: auto;
+            overflow: hidden;
         }
 
         #log-area {
             background: #111;
             color: var(--terminal-text);
             flex: 1;
-            min-height: 200px;
+            min-height: 0;
             padding: 10px;
             font-size: 0.9rem;
             overflow-y: auto;
@@ -348,4 +348,35 @@
     color: #fff;
     padding: 15px;
     font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+    body {
+        overflow: auto; /* Allow scrolling on smaller screens */
+    }
+
+    #game-area {
+        flex-direction: column;
+    }
+
+    #viewport {
+        border-right: none;
+        border-bottom: 4px solid #111;
+        min-height: 350px;
+    }
+
+    #admission-doc {
+        transform: none; /* Make it straight */
+        position: relative; /* Put it in the layout flow */
+        width: auto;
+        left: auto;
+        top: auto;
+        margin: 10px; /* Give it some space */
+        box-shadow: none;
+        order: -1; /* Display it before other flex items in the viewport */
+    }
+
+    .patient-sprite {
+        margin-bottom: 0; /* Remove the negative margin that pulls it down */
+    }
 }
