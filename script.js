@@ -79,7 +79,6 @@ function clearState() {
     localStorage.removeItem('examsPleaseGameState');
 }
 
-
 // --- 1. FLUXO PRINCIPAL ---
 
 function switchScreen(name) {
@@ -148,18 +147,35 @@ async function generateNewCase() {
     const disease = await getDisease();
 
     const prompt = `
-        Atue como um gerador de casos clínicos para simulação médica.
-        PATOLOGIA DESIGNADA PARA ESTE CASO:
-        ${disease}
-        Crie um caso clínico baseado nesta patologia.
-        ESTRUTURA JSON OBRIGATÓRIA:
-        {
-            "patient": { "name": "...", "age": "...", ... },
-            "triage": { "chief_complaint": "...", "vitals": "..." },
-            "hidden_truth": { ... }
-        }
-        Retorne APENAS o JSON, sem markdown.
-    `;
+            Atue como um gerador de casos clínicos para simulação médica.
+            
+            PATOLOGIA DESIGNADA PARA ESTE CASO:
+            ${disease}
+
+            Crie um caso clínico baseado nesta patologia.
+
+            ESTRUTURA JSON OBRIGATÓRIA:
+            {
+                "patient": {
+                    "name": "Nome Completo", "age": "Idade", "gender": "Gênero", "job": "Profissão",
+                    "visual_appearance": "Descrição visual (ex: dispneico, corado, emagrecido)",
+                    "personality": "Personalidade (ex: teimoso, prolixo, assustado, hostil)"
+                },
+                "triage": {
+                    "chief_complaint": "Queixa Principal (em linguagem leiga)",
+                    "vitals": "PA, FC, FR, Temp, SatO2, Destro (se necessário)"
+                },
+                "hidden_truth": {
+                    "history_hpi": "HDA detalhada (termos médicos)",
+                    "history_social": "Histórico Social/Familiar/Hábitos",
+                    "physical_exam": "Exame Físico completo (dados positivos e negativos pertinentes)",
+                    "labs_and_imaging": "Resultados de exames esperados para este caso (se houver indicação)",
+                    "diagnosis": "Diagnóstico Definitivo",
+                    "pathophysiology": "Fisiopatologia resumida"
+                }
+            }
+            Retorne APENAS o JSON, sem markdown.
+        `;
 
     try {
         const result = await callGeminiAPI(prompt, true);
@@ -191,11 +207,29 @@ function initializeChatContext() {
     chatHistory = [
         {
             role: "user",
-            parts: [{ text: `SYSTEM INSTRUCTION: ... DADOS OCULTOS (VERDADE): ${JSON.stringify(currentCase.hidden_truth)}` }]
+            parts: [{ text: `
+                SYSTEM INSTRUCTION:
+                Você é o motor de um simulador médico "Exams, Please". Duas personas:
+                
+                1. O PACIENTE (${currentCase.patient.name}): 
+                   - Personalidade: '${currentCase.patient.personality}'.
+                   - Linguagem leiga. Não usa termos médicos.
+                   - Não revele o diagnóstico, apenas sintomas.
+
+                2. O SISTEMA DE EXAMES / NARRADOR TÉCNICO:
+                   - ATIVADO QUANDO: O usuário pede exame, sinal vital, ou faz ação física (ex: "Palpar abdome").
+                   - REGRA DE OURO: SEJA EXTREMAMENTE CONCISO E TELEGRÁFICO.
+                   - MÁXIMO 1-2 LINHAS. Use abreviações médicas padrão.
+                   - IMPORTANTE: Para EXAMES DE SANGUE/LABORATORIAIS, você DEVE fornecer valores de referência (VR) abreviados ao lado dos resultados alterados ou relevantes. 
+                     Ex: "Hb 10.2 (VR 12-16), Leuc 18k (VR 4-10k), Plaq 150k (VR 150-450k)".
+                   - Se o dado não existir no JSON oculto, invente um resultado compatível com o quadro.
+
+                DADOS OCULTOS (VERDADE): ${JSON.stringify(currentCase.hidden_truth)}
+            `}]
         },
         {
             role: "model",
-            parts: [{ text: "Entendido." }]
+            parts: [{ text: "Entendido. Serei breve e sempre incluirei VR em exames laboratoriais." }]
         }
     ];
 }
@@ -227,7 +261,7 @@ async function performAction() {
         const response = await callGeminiChat(userMessage);
         addLog(response, 'sys');
 
-        if (response.length < 200 && !response.match(/exame|resultado|vr/i)) {
+        if (response.length < 200 && !response.match(/exame|resultado|vr|referência/i)) {
             document.getElementById('patient-dialogue').innerText = `"${response}"`;
         } else {
             document.getElementById('patient-dialogue').innerText = "(Analisando prontuário...)";
@@ -247,19 +281,59 @@ function openDiagModal() { document.getElementById('diag-modal').style.display =
 function closeDiagModal() { document.getElementById('diag-modal').style.display = 'none'; }
 
 async function submitCase() {
-    // ... (código existente)
-    
-    // Simulação da submissão
+    const diag = document.getElementById('final-diag').value;
+    const just = document.getElementById('final-just').value;
+    const cond = document.getElementById('final-conduta').value;
+
+    if(!diag || !just || !cond) { 
+        alert("Por favor, preencha todos os campos do prontuário final."); 
+        return; 
+    }
+
     switchScreen('loading');
     document.getElementById('loading-text').innerText = "AUDITANDO PRONTUÁRIO...";
-    // ... (código para chamar a API de avaliação)
-    
-    // Após a avaliação...
-    // const report = await callGeminiAPI(...);
-    // document.getElementById('report-content').innerHTML = report;
-    switchScreen('report'); // Temporário
-    clearState(); // Limpa o estado para o próximo caso
+
+    const evaluationPrompt = `
+        AVALIAÇÃO FINAL (AUDITORIA MÉDICA).
+        
+        GABARITO REAL (HIDDEN TRUTH): ${JSON.stringify(currentCase.hidden_truth)}
+        
+        RESPOSTA DO ALUNO: 
+        - Hipótese Diagnóstica: "${diag}"
+        - Justificativa do Raciocínio: "${just}"
+        - Conduta Terapêutica: "${cond}"
+        
+        HISTÓRICO DE AÇÕES E PERGUNTAS: ${JSON.stringify(chatHistory.slice(2))}
+        
+        TAREFA:
+        Atue como um Professor de Medicina rigoroso. Gere um relatório HTML estruturado (dentro de uma <div>).
+        
+        SEÇÕES OBRIGATÓRIAS:
+        1. 🏥 VEREDITO: O diagnóstico está correto? (Sim/Não/Parcialmente). A conduta salva ou mata?
+        2. 🧠 ANÁLISE DO RACIOCÍNIO: A justificativa do aluno faz sentido com os sintomas? Ele correlacionou anatomia/fisiologia corretamente?
+        3. 💰 CUSTO-EFETIVIDADE: O aluno pediu exames desnecessários no chat? (Critique gastos excessivos, alinhado com a eficiência do SUS).
+        4. 🔬 CORRELAÇÃO ACADÊMICA (Obrigatório): Explique o caso usando:
+           - Anatomia (Onde?)
+           - Fisiopatologia (O que ocorreu?)
+           - Semiologia (Sinais chaves perdidos ou achados)
+        
+        NOTA FINAL (0 a 10).
+        
+        Estilo: Use emojis, <b>negrito</b> para destaques, e <ul> para listas. Texto direto e educativo.
+    `;
+
+    try {
+        const report = await callGeminiAPI(evaluationPrompt, false);
+        const cleanReport = report.replace(/```html/g, '').replace(/```/g, '');
+        document.getElementById('report-content').innerHTML = cleanReport;
+        switchScreen('report');
+        clearState();
+    } catch (e) {
+        alert("Erro na auditoria. Tente novamente.");
+        switchScreen('game');
+    }
 }
+
 
 function nextCase() {
     clearState();
@@ -277,7 +351,77 @@ function addLog(text, type) {
     area.scrollTop = area.scrollHeight;
 }
 
-// ... (Restante do código para addRetryLog, fetchWithRetry, callGeminiAPI)
+function addRetryLog(attempt) {
+    const div = document.createElement('div');
+    div.className = 'log-retry';
+    div.innerText = `... Falha na conexão. Retentativa ${attempt}/3 ...`;
+    const area = document.getElementById('log-area');
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+}
+
+async function fetchWithRetry(url, options, retries = 3) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            const response = await fetch(url, options);
+            
+            if (response.status === 400) {
+                const errText = await response.text();
+                console.error("API 400 Error:", errText);
+                throw new Error("HTTP 400: Bad Request (Possible JSON Mode mismatch)");
+            }
+
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return await response.json();
+        } catch (err) {
+            if (err.message.includes("400")) throw err;
+
+            console.warn(`Tentativa ${i+1} falhou: ${err.message}`);
+            if (i < retries - 1) {
+                addRetryLog(i + 1);
+                await new Promise(res => setTimeout(res, 1000 * Math.pow(2, i)));
+            } else {
+                throw err; 
+            }
+        }
+    }
+}
+
+async function callGeminiAPI(prompt, isJsonMode) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
+    
+    let body = { contents: [{ parts: [{ text: prompt }] }] };
+    
+    if(isJsonMode) {
+        body.generationConfig = { responseMimeType: "application/json" };
+    }
+
+    try {
+        const data = await fetchWithRetry(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        return data.candidates[0].content.parts[0].text;
+    } catch (error) {
+        if (isJsonMode && error.message.includes("400")) {
+            console.warn("JSON Mode falhou com alias 'latest'. Tentando modo texto simples...");
+            
+            delete body.generationConfig;
+            
+            const fallbackResponse = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            if(!fallbackResponse.ok) throw new Error("Falha no Fallback: " + fallbackResponse.status);
+            const fallbackData = await fallbackResponse.json();
+            return fallbackData.candidates[0].content.parts[0].text;
+        }
+        throw error;
+    }
+}
 
 async function callGeminiChat(newMessage) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
@@ -295,39 +439,4 @@ async function callGeminiChat(newMessage) {
     chatHistory.push({ role: "model", parts: [{ text: text }] });
     saveState(); // Salva o estado após cada interação
     return text;
-}
-
-// ... (O resto do seu código, como fetchWithRetry, callGeminiAPI, etc.)
-// Tenha certeza que todas as funções referenciadas (como fetchWithRetry) estão no lugar.
-// O código abaixo é um placeholder para as funções que não foram totalmente mostradas no prompt.
-
-async function fetchWithRetry(url, options, retries = 3) {
-    for (let i = 0; i < retries; i++) {
-        try {
-            const response = await fetch(url, options);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            return await response.json();
-        } catch (err) {
-            console.warn(`Tentativa ${i+1} falhou: ${err.message}`);
-            if (i < retries - 1) {
-                await new Promise(res => setTimeout(res, 1000 * Math.pow(2, i)));
-            } else {
-                throw err;
-            }
-        }
-    }
-}
-
-async function callGeminiAPI(prompt, isJsonMode) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
-    let body = { contents: [{ parts: [{ text: prompt }] }] };
-    if (isJsonMode) {
-        body.generationConfig = { responseMimeType: "application/json" };
-    }
-    const data = await fetchWithRetry(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-    });
-    return data.candidates[0].content.parts[0].text;
 }
