@@ -267,6 +267,7 @@
             margin-top: 0; 
             text-transform: uppercase; 
             font-family: 'Workbench', sans-serif;
+            font-variation-settings: "BLED" 0, "SCAN" -10;
         }
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
