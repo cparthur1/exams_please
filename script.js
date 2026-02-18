@@ -2,6 +2,14 @@
 let apiKey = "";
 const MODEL_NAME = "gemini-flash-latest";
 
+// --- AUDIO ---
+const themeMusic = new Audio('effects/theme.mp3');
+themeMusic.loop = true;
+const concluirSound = new Audio('effects/concluir.mp3');
+const executarSound = new Audio('effects/executar.mp3');
+const proximoSound = new Audio('effects/proximo.mp3');
+const printerSound = new Audio('effects/printer.mp3');
+
 // --- ESTADO ---
 let currentCase = null;
 let chatHistory = [];
@@ -68,6 +76,7 @@ function loadState() {
             });
 
             switchScreen('game');
+            themeMusic.play();
         } else if (apiKey) {
             document.getElementById('api-key-input').value = apiKey;
             switchScreen('start');
@@ -94,6 +103,7 @@ function startShift() {
     }
     apiKey = inputKey;
     saveState();
+    themeMusic.play();
     generateNewCase();
 }
 
@@ -237,6 +247,7 @@ function initializeChatContext() {
 // --- 3. LOOP DO JOGO ---
 
 async function performAction() {
+    executarSound.play();
     const btn = document.getElementById('btn-exec');
     const action = document.getElementById('input-action').value;
     const just = document.getElementById('input-justification').value;
@@ -281,6 +292,7 @@ function openDiagModal() { document.getElementById('diag-modal').style.display =
 function closeDiagModal() { document.getElementById('diag-modal').style.display = 'none'; }
 
 async function submitCase() {
+    concluirSound.play();
     const diag = document.getElementById('final-diag').value;
     const just = document.getElementById('final-just').value;
     const cond = document.getElementById('final-conduta').value;
@@ -326,7 +338,10 @@ async function submitCase() {
         const report = await callGeminiAPI(evaluationPrompt, false);
         const cleanReport = report.replace(/```html/g, '').replace(/```/g, '');
         document.getElementById('report-content').innerHTML = cleanReport;
+        printerSound.play();
         switchScreen('report');
+        themeMusic.pause();
+        themeMusic.currentTime = 0;
         clearState();
     } catch (e) {
         alert("Erro na auditoria. Tente novamente.");
@@ -336,7 +351,9 @@ async function submitCase() {
 
 
 function nextCase() {
+    proximoSound.play();
     clearState();
+    themeMusic.play();
     generateNewCase();
 }
 
