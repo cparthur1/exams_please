@@ -278,6 +278,7 @@ async function performAction() {
             answerSound.play();
         } else {
             document.getElementById('patient-dialogue').innerText = "(Analisando prontuário...)";
+            answerSound.play();
         }
 
     } catch (e) {
