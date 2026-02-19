@@ -275,11 +275,10 @@ async function performAction() {
 
         if (response.length < 200 && !response.match(/exame|resultado|vr|referência/i)) {
             document.getElementById('patient-dialogue').innerText = `"${response}"`;
-            answerSound.play();
         } else {
             document.getElementById('patient-dialogue').innerText = "(Analisando prontuário...)";
-            answerSound.play();
         }
+        answerSound.play();
 
     } catch (e) {
         addLog(`ERRO FINAL: ${e.message}`, 'error');

@@ -161,10 +161,12 @@
             font-style: italic;
             font-size: 1.1rem;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             z-index: 20;
             position: relative;
+            max-height: 80px;
+            overflow-y: auto;
         }
 
         #desk {
