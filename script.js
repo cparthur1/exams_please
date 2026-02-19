@@ -9,6 +9,7 @@ const concluirSound = new Audio('effects/concluir.mp3');
 const executarSound = new Audio('effects/executar.mp3');
 const proximoSound = new Audio('effects/proximo.mp3');
 const printerSound = new Audio('effects/printer.mp3');
+const answerSound = new Audio('effects/answer.mp3');
 
 // --- ESTADO ---
 let currentCase = null;
@@ -274,6 +275,7 @@ async function performAction() {
 
         if (response.length < 200 && !response.match(/exame|resultado|vr|referência/i)) {
             document.getElementById('patient-dialogue').innerText = `"${response}"`;
+            answerSound.play();
         } else {
             document.getElementById('patient-dialogue').innerText = "(Analisando prontuário...)";
         }
