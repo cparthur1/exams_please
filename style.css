@@ -60,6 +60,66 @@
             margin-top: 5px;
         }
         .api-link:hover { color: #fff; }
+
+        .db-upload {
+            margin-top: 10px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .db-upload label {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .custom-file-btn {
+            background: #222;
+            color: #aaa;
+            border: 1px dashed #555;
+            padding: 8px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.8rem;
+            box-sizing: border-box;
+        }
+
+        .custom-file-btn:hover {
+            border-color: var(--accent-green);
+            color: #fff;
+        }
+
+        .db-status {
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .reset-link {
+            color: var(--accent-red);
+            font-size: 0.7rem;
+            text-decoration: underline;
+            cursor: pointer;
+            margin-top: 5px;
+            display: none; /* Hidden by default */
+        }
         
         /* TELA 2: LOADING */
         #loading-screen {

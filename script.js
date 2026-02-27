@@ -17,6 +17,7 @@ let chatHistory = [];
 let caseCount = 0;
 let allDiseases = [];
 let usedDiseases = [];
+let databaseName = "PADRÃO (REPOSITÓRIO)";
 
 // --- ELEMENTOS ---
 const screens = {
@@ -38,6 +39,7 @@ function saveState() {
         caseCount,
         usedDiseases,
         allDiseases,
+        databaseName,
     };
     localStorage.setItem('examsPleaseGameState', JSON.stringify(gameState));
 }
@@ -52,6 +54,11 @@ function loadState() {
         caseCount = gameState.caseCount || 0;
         usedDiseases = gameState.usedDiseases || [];
         allDiseases = gameState.allDiseases || [];
+        databaseName = gameState.databaseName || "PADRÃO (REPOSITÓRIO)";
+
+        if (databaseName !== "PADRÃO (REPOSITÓRIO)") {
+            updateDBUI(databaseName);
+        }
 
         if (apiKey && currentCase) {
             document.getElementById('api-key-input').value = apiKey;
@@ -89,6 +96,80 @@ function clearState() {
     localStorage.removeItem('examsPleaseGameState');
 }
 
+// --- BANCO DE DADOS CUSTOMIZADO ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    const fileInput = document.getElementById('db-file-input');
+    if (fileInput) {
+        fileInput.addEventListener('change', handleFileUpload);
+    }
+});
+
+async function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        const content = e.target.result;
+        try {
+            let diseases = [];
+            if (file.name.endsWith('.json')) {
+                const json = JSON.parse(content);
+                if (Array.isArray(json)) {
+                    diseases = json;
+                } else {
+                    throw new Error("Formato JSON inválido. Deve ser um array de strings.");
+                }
+            } else {
+                // Assume formato ponto-e-vírgula
+                diseases = content.split(';').map(d => d.trim()).filter(d => d);
+            }
+
+            if (diseases.length === 0) {
+                throw new Error("O arquivo está vazio ou não contém doenças válidas.");
+            }
+
+            allDiseases = diseases;
+            usedDiseases = [];
+            databaseName = file.name;
+            updateDBUI(databaseName);
+            saveState();
+            alert(`Banco de dados carregado: ${file.name} (${diseases.length} doenças)`);
+        } catch (error) {
+            console.error("Erro ao carregar banco:", error);
+            alert("Erro ao processar arquivo: " + error.message);
+        }
+    };
+    reader.readAsText(file);
+}
+
+function updateDBUI(name) {
+    const btnText = document.getElementById('file-btn-text');
+    const statusText = document.getElementById('db-filename');
+    const resetLink = document.getElementById('reset-db');
+    
+    if (name === "PADRÃO (REPOSITÓRIO)") {
+        btnText.innerText = "USAR BANCO PADRÃO (REPOSITÓRIO)";
+        statusText.innerText = "Nenhum arquivo customizado selecionado.";
+        resetLink.style.display = "none";
+    } else {
+        btnText.innerText = `BANCO: ${name}`;
+        statusText.innerText = `Arquivo carregado: ${name}`;
+        resetLink.style.display = "block";
+    }
+}
+
+function resetDefaultDB() {
+    allDiseases = [];
+    usedDiseases = [];
+    databaseName = "PADRÃO (REPOSITÓRIO)";
+    document.getElementById('db-file-input').value = "";
+    updateDBUI(databaseName);
+    saveState();
+    alert("Voltando para o banco de dados padrão.");
+}
+
 // --- 1. FLUXO PRINCIPAL ---
 
 function switchScreen(name) {
@@ -116,9 +197,11 @@ async function getDisease() {
             const response = await fetch('doencas.json');
             const text = await response.text();
             allDiseases = text.split(';').map(d => d.trim()).filter(d => d);
+            databaseName = "PADRÃO (REPOSITÓRIO)";
         } catch (error) {
             console.error("Failed to load diseases:", error);
             allDiseases = ["Hipertensão Arterial Sistêmica (HAS) Primária", "Doença Arterial Coronariana (DAC) Crônica", "Insuficiência Cardíaca (IC) com Fração de Ejeção Reduzida"];
+            databaseName = "LISTA DE EMERGÊNCIA (ERRO DE CARGA)";
         }
     }
 
@@ -212,6 +295,7 @@ function setupGameUI() {
     document.getElementById('doc-patient-info').innerHTML = `<strong>Nome:</strong> ${p.name}<br><strong>Idade:</strong> ${p.age} | <strong>Ocup:</strong> ${p.job}`;
     document.getElementById('doc-vitals').innerHTML = `<strong>QP:</strong> "${t.chief_complaint}"<br><strong>Sinais:</strong> ${t.vitals}`;
     document.getElementById('patient-dialogue').innerText = `"${t.chief_complaint}"`;
+    document.getElementById('db-info').innerText = `BANCO: ${databaseName}`;
 }
 
 function initializeChatContext() {

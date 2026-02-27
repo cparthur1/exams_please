@@ -25,6 +25,16 @@
             
             <a href="https://aistudio.google.com/api-keys" target="_blank" class="api-link">Não tenho chave da API (Gerar Grátis)</a>
             
+            <div class="db-upload">
+                <label>BANCO DE CASOS (OPCIONAL):</label>
+                <div class="file-input-wrapper">
+                    <button class="custom-file-btn" id="file-btn-text">USAR BANCO PADRÃO (REPOSITÓRIO)</button>
+                    <input type="file" id="db-file-input" accept=".json,.txt">
+                </div>
+                <div id="db-filename" class="db-status">Nenhum arquivo customizado selecionado.</div>
+                <a onclick="resetDefaultDB()" id="reset-db" class="reset-link">Voltar para o banco padrão</a>
+            </div>
+
             <p class="model-info">Modelo: gemini-flash-latest</p>
         </div>
     </div>
@@ -39,7 +49,7 @@
     <!-- TELA 3: JOGO -->
     <div id="game-screen" class="screen">
         <div id="status-bar">
-            <span>PLANTONISTA: DR(A). ESTUDANTE</span>
+            <span id="db-info">BANCO: PADRÃO (REPOSITÓRIO)</span>
             <span>CASO: <span id="case-id">#000</span></span>
         </div>
 
