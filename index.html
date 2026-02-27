@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,10 +9,11 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2b3026">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Workbench&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Workbench&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <!-- TELA 1: LOGIN -->
@@ -19,12 +21,13 @@
         <div class="login-box">
             <h1>Exams, Please</h1>
             <p>Insira sua credencial para iniciar o plantão. (Gemini API Key)</p>
-            
+
             <input type="password" id="api-key-input" placeholder="Cole sua API Key aqui">
             <button onclick="startShift()">INICIAR PLANTÃO</button>
-            
-            <a href="https://aistudio.google.com/api-keys" target="_blank" class="api-link">Não tenho chave da API (Gerar Grátis)</a>
-            
+
+            <a href="https://aistudio.google.com/api-keys" target="_blank" class="api-link">Não tenho chave da API
+                (Gerar Grátis)</a>
+
             <div class="db-upload">
                 <label>BANCO DE CASOS (OPCIONAL):</label>
                 <div class="file-input-wrapper">
@@ -49,6 +52,7 @@
     <!-- TELA 3: JOGO -->
     <div id="game-screen" class="screen">
         <div id="status-bar">
+            <button id="btn-back-login" onclick="backToLogin()">← SAIR DO PLANTÃO</button>
             <span id="db-info">BANCO: PADRÃO (REPOSITÓRIO)</span>
             <span>CASO: <span id="case-id">#000</span></span>
         </div>
@@ -77,10 +81,10 @@
                 <div id="controls">
                     <label>AÇÃO / PERGUNTA:</label>
                     <input type="text" id="input-action" placeholder="Ex: Examinar abdome / Tem febre? / Hemograma">
-                    
+
                     <label>JUSTIFICATIVA (Obrigatório):</label>
                     <input type="text" id="input-justification" placeholder="Justifique (economize recursos públicos)">
-                    
+
                     <button id="btn-exec" onclick="performAction()">EXECUTAR</button>
                 </div>
 
@@ -91,12 +95,13 @@
         <!-- Modal Diagnóstico -->
         <div id="diag-modal">
             <h3>PRONTUÁRIO FINAL</h3>
-            
+
             <label>1. HIPÓTESE DIAGNÓSTICA:</label>
             <input type="text" id="final-diag" placeholder="Ex: Apendicite Aguda">
 
             <label>2. JUSTIFICATIVA / RACIOCÍNIO CLÍNICO:</label>
-            <textarea id="final-just" placeholder="Por que você chegou a este diagnóstico? Quais achados confirmam?"></textarea>
+            <textarea id="final-just"
+                placeholder="Por que você chegou a este diagnóstico? Quais achados confirmam?"></textarea>
 
             <label>3. CONDUTA TERAPÊUTICA:</label>
             <input type="text" id="final-conduta" placeholder="Ex: Internação, Cirurgia, Analgesia...">
@@ -117,17 +122,18 @@
         </div>
     </div>
 
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js').then(registration => {
-                console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            }, err => {
-                console.log('ServiceWorker registration failed: ', err);
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
             });
-        });
-    }
-</script>
-<script src="script.js"></script>
+        }
+    </script>
+    <script src="script.js"></script>
 </body>
+
 </html>

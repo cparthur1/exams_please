@@ -63,9 +63,9 @@ function loadState() {
         if (apiKey && currentCase) {
             document.getElementById('api-key-input').value = apiKey;
             document.getElementById('case-id').innerText = `#${String(caseCount).padStart(3, '0')}`;
-            
+
             setupGameUI();
-            
+
             document.getElementById('log-area').innerHTML = "";
             chatHistory.slice(2).forEach(entry => {
                 if (entry.role === 'user') {
@@ -76,7 +76,7 @@ function loadState() {
                         addLog(`AÇÃO: ${actionMatch[1]}`, 'user');
                         addLog(`JUSTIF: ${justMatch[1]}`, 'sys');
                     } else {
-                         addLog(text, 'user');
+                        addLog(text, 'user');
                     }
                 } else {
                     addLog(entry.parts[0].text, 'sys');
@@ -148,7 +148,7 @@ function updateDBUI(name) {
     const btnText = document.getElementById('file-btn-text');
     const statusText = document.getElementById('db-filename');
     const resetLink = document.getElementById('reset-db');
-    
+
     if (name === "PADRÃO (REPOSITÓRIO)") {
         btnText.innerText = "USAR BANCO PADRÃO (REPOSITÓRIO)";
         statusText.innerText = "Nenhum arquivo customizado selecionado.";
@@ -187,6 +187,15 @@ function startShift() {
     saveState();
     themeMusic.play();
     generateNewCase();
+}
+
+function backToLogin() {
+    if (confirm("Deseja realmente sair do plantão? O progresso do caso atual será perdido.")) {
+        clearState();
+        themeMusic.pause();
+        themeMusic.currentTime = 0;
+        switchScreen('start');
+    }
 }
 
 // --- 2. GERAÇÃO DE CASO (IA) ---
@@ -275,7 +284,7 @@ async function generateNewCase() {
         const result = await callGeminiAPI(prompt, true);
         const cleanJson = result.replace(/```json/g, '').replace(/```/g, '').trim();
         currentCase = JSON.parse(cleanJson);
-        
+
         initializeChatContext();
         setupGameUI();
         switchScreen('game');
@@ -302,7 +311,8 @@ function initializeChatContext() {
     chatHistory = [
         {
             role: "user",
-            parts: [{ text: `
+            parts: [{
+                text: `
                 SYSTEM INSTRUCTION:
                 Você é o motor de um simulador médico "Exams, Please". Duas personas:
                 
@@ -383,9 +393,9 @@ async function submitCase() {
     const just = document.getElementById('final-just').value;
     const cond = document.getElementById('final-conduta').value;
 
-    if(!diag || !just || !cond) { 
-        alert("Por favor, preencha todos os campos do prontuário final."); 
-        return; 
+    if (!diag || !just || !cond) {
+        alert("Por favor, preencha todos os campos do prontuário final.");
+        return;
     }
 
     switchScreen('loading');
@@ -467,7 +477,7 @@ async function fetchWithRetry(url, options, retries = 3) {
     for (let i = 0; i < retries; i++) {
         try {
             const response = await fetch(url, options);
-            
+
             if (response.status === 400) {
                 const errText = await response.text();
                 console.error("API 400 Error:", errText);
@@ -479,12 +489,12 @@ async function fetchWithRetry(url, options, retries = 3) {
         } catch (err) {
             if (err.message.includes("400")) throw err;
 
-            console.warn(`Tentativa ${i+1} falhou: ${err.message}`);
+            console.warn(`Tentativa ${i + 1} falhou: ${err.message}`);
             if (i < retries - 1) {
                 addRetryLog(i + 1);
                 await new Promise(res => setTimeout(res, 1000 * Math.pow(2, i)));
             } else {
-                throw err; 
+                throw err;
             }
         }
     }
@@ -492,10 +502,10 @@ async function fetchWithRetry(url, options, retries = 3) {
 
 async function callGeminiAPI(prompt, isJsonMode) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
-    
+
     let body = { contents: [{ parts: [{ text: prompt }] }] };
-    
-    if(isJsonMode) {
+
+    if (isJsonMode) {
         body.generationConfig = { responseMimeType: "application/json" };
     }
 
@@ -509,16 +519,16 @@ async function callGeminiAPI(prompt, isJsonMode) {
     } catch (error) {
         if (isJsonMode && error.message.includes("400")) {
             console.warn("JSON Mode falhou com alias 'latest'. Tentando modo texto simples...");
-            
+
             delete body.generationConfig;
-            
+
             const fallbackResponse = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
             });
 
-            if(!fallbackResponse.ok) throw new Error("Falha no Fallback: " + fallbackResponse.status);
+            if (!fallbackResponse.ok) throw new Error("Falha no Fallback: " + fallbackResponse.status);
             const fallbackData = await fallbackResponse.json();
             return fallbackData.candidates[0].content.parts[0].text;
         }
