@@ -267,8 +267,9 @@ body {
 #log-area {
     background: #111;
     color: var(--terminal-text);
-    flex: 1;
-    min-height: 0;
+    height: 300px;
+    /* Fixed height to prevent growing */
+    min-height: 300px;
     padding: 10px;
     font-size: 0.9rem;
     overflow-y: auto;
