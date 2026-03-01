@@ -153,6 +153,8 @@ body {
 #game-screen {
     flex-direction: column;
     z-index: 1;
+    overflow: hidden;
+    /* Added */
 }
 
 /* --- COMPONENTES DO JOGO --- */
@@ -186,6 +188,8 @@ body {
     display: flex;
     flex: 1;
     position: relative;
+    min-height: 0;
+    /* Added */
 }
 
 /* Left: Viewport (Patient) */
@@ -262,12 +266,14 @@ body {
     flex-direction: column;
     gap: 10px;
     overflow: hidden;
+    min-height: 0;
 }
 
 #log-area {
     background: #111;
     color: var(--terminal-text);
     flex: 1;
+    min-height: 0;
     padding: 10px;
     font-size: 0.9rem;
     overflow-y: auto;

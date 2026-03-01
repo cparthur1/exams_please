@@ -18,6 +18,7 @@ let caseCount = 0;
 let allDiseases = [];
 let usedDiseases = [];
 let databaseName = "PADRÃO (REPOSITÓRIO)";
+let testMode = false;
 
 // --- ELEMENTOS ---
 const screens = {
@@ -184,6 +185,14 @@ function startShift() {
         return;
     }
     apiKey = inputKey;
+    saveState();
+    themeMusic.play();
+    generateNewCase();
+}
+
+function startTestShift() {
+    testMode = true;
+    apiKey = "MOCK_KEY";
     saveState();
     themeMusic.play();
     generateNewCase();
@@ -517,6 +526,28 @@ async function callGeminiAPI(prompt, isJsonMode) {
         });
         return data.candidates[0].content.parts[0].text;
     } catch (error) {
+        if (testMode) {
+            console.log("Mocking JSON Mode Response");
+            return JSON.stringify({
+                "patient": {
+                    "name": "João Teste", "age": "45", "gender": "Masculino", "job": "Desenvolvedor",
+                    "visual_appearance": "Calmo, olhando para o teto.",
+                    "personality": "Colaborativo mas objetivo."
+                },
+                "triage": {
+                    "chief_complaint": "Dor no peito ao codar",
+                    "vitals": "PA 120/80, FC 70, FR 16, Temp 36.5, SatO2 98%"
+                },
+                "hidden_truth": {
+                    "history_hpi": "Paciente refere dor torácica tipo pontada.",
+                    "history_social": "Sedentário, toma muito café.",
+                    "physical_exam": "Ausculta normal, sem sinais de instabilidade.",
+                    "labs_and_imaging": "ECG normal, Troponina negativa.",
+                    "diagnosis": "Dermatite de Contato (Mock)",
+                    "pathophysiology": "Irritação local por contato com teclado antigo."
+                }
+            });
+        }
         if (isJsonMode && error.message.includes("400")) {
             console.warn("JSON Mode falhou com alias 'latest'. Tentando modo texto simples...");
 
@@ -547,6 +578,10 @@ async function callGeminiChat(newMessage) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
     });
+
+    if (testMode) {
+        return "Este é um resultado de exame simulado (MODO TESTE). Tudo parece normal no momento.";
+    }
 
     const text = data.candidates[0].content.parts[0].text;
     chatHistory.push({ role: "model", parts: [{ text: text }] });
