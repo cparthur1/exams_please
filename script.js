@@ -604,6 +604,20 @@ function dragElement(elmnt) {
   function dragMouseDown(e) {
     e = e || window.event;
     e.preventDefault();
+    
+    // Fix: Convert initial CSS centering (top:50%, left:50%, transform:translate) 
+    // to actual pixel values before the first drag begins.
+    const style = window.getComputedStyle(elmnt);
+    if (style.transform !== "none") {
+        const rect = elmnt.getBoundingClientRect();
+        // Use offsetParent because top/left are relative to it
+        const parentRect = elmnt.offsetParent ? elmnt.offsetParent.getBoundingClientRect() : {top:0, left:0};
+        elmnt.style.top = (rect.top - parentRect.top) + "px";
+        elmnt.style.left = (rect.left - parentRect.left) + "px";
+        elmnt.style.transform = "none";
+        elmnt.style.position = "absolute"; // Ensure it's absolute for movement
+    }
+
     // get the mouse cursor position at startup:
     pos3 = e.clientX;
     pos4 = e.clientY;
@@ -673,7 +687,7 @@ function addProfChatMessage(text, role) {
 }
 
 // Initializing
-window.addEventListener('load', () => {
+function initExamsDraggables() {
     const diagModal = document.getElementById("diag-modal");
     if (diagModal) dragElement(diagModal);
 
@@ -683,4 +697,10 @@ window.addEventListener('load', () => {
             if (e.key === 'Enter') askProfessor();
         });
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    window.addEventListener('load', initExamsDraggables);
+} else {
+    initExamsDraggables();
+}

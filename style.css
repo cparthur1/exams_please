@@ -370,9 +370,11 @@ button:disabled {
     padding: 10px;
     cursor: move;
     font-weight: bold;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     border-bottom: 1px solid #555;
     text-align: center;
+    font-family: 'Workbench', sans-serif;
+    text-transform: uppercase;
 }
 
 #diag-modal > *:not(#diag-modal-header) {
