@@ -97,7 +97,7 @@
 
         <!-- Modal Diagnóstico -->
         <div id="diag-modal">
-            <h3>PRONTUÁRIO FINAL</h3>
+            <div id="diag-modal-header">PRONTUÁRIO FINAL (Arraste para mover)</div>
 
             <label>1. HIPÓTESE DIAGNÓSTICA:</label>
             <input type="text" id="final-diag" placeholder="Ex: Apendicite Aguda">
@@ -116,12 +116,25 @@
 
     <!-- TELA 4: RELATÓRIO -->
     <div id="report-screen" class="screen">
-        <div id="report-paper">
-            <h1>AUDITORIA MÉDICA</h1>
-            <div id="report-content">
-                <!-- Preenchido via JS -->
+        <div id="report-wrapper">
+            <div id="report-paper">
+                <h1>AUDITORIA MÉDICA</h1>
+                <div id="report-content">
+                    <!-- Preenchido via JS -->
+                </div>
+                <button onclick="nextCase()">PRÓXIMO PACIENTE >></button>
             </div>
-            <button onclick="nextCase()">PRÓXIMO PACIENTE >></button>
+
+            <div id="professor-chat">
+                <div id="chat-prof-header">CONVERSAR COM O PROFESSOR</div>
+                <div id="chat-prof-log">
+                    <div class="msg prof">"Alguma dúvida sobre a conduta deste caso, doutor?"</div>
+                </div>
+                <div id="chat-prof-input-area">
+                    <input type="text" id="input-prof" placeholder="Pergunte ao professor...">
+                    <button onclick="askProfessor()">ENVIAR</button>
+                </div>
+            </div>
         </div>
     </div>
 

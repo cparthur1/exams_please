@@ -588,3 +588,99 @@ async function callGeminiChat(newMessage) {
     saveState(); // Salva o estado após cada interação
     return text;
 }
+
+// --- DRAGGABLE MODAL ---
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  const header = document.getElementById(elmnt.id + "-header");
+  if (header) {
+    // if present, the header is where you move the DIV from:
+    header.onmousedown = dragMouseDown;
+  } else {
+    // otherwise, move the DIV from anywhere inside the DIV:
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    elmnt.style.transform = "none";
+  }
+
+  function closeDragElement() {
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
+
+// --- PROFESSOR CHAT ---
+async function askProfessor() {
+    const input = document.getElementById('input-prof');
+    const text = input.value.trim();
+    if (!text) return;
+
+    addProfChatMessage(text, 'user');
+    input.value = '';
+
+    const profPrompt = `
+        Aja como um Professor de Medicina experiente, rigoroso mas didático. 
+        O aluno recebeu uma auditoria e quer tirar dúvidas.
+        DADOS DO CASO:
+        - Diagnóstico: ${currentCase.hidden_truth.diagnostico}
+        - Fisiopatologia: ${currentCase.hidden_truth.fisiopatologia}
+        - Conduta: ${currentCase.hidden_truth.conduta}
+        DÚVIDA DO ALUNO: "${text}"
+        Responda como o Professor em no máximo 2 parágrafos.
+    `;
+
+    try {
+        const typingDiv = addProfChatMessage("O professor está escrevendo...", 'prof');
+        const response = await callGeminiAPI(profPrompt, false);
+        typingDiv.remove();
+        addProfChatMessage(response, 'prof');
+    } catch (e) {
+        addProfChatMessage("Erro ao contatar o professor. Tente novamente.", 'prof');
+    }
+}
+
+function addProfChatMessage(text, role) {
+    const log = document.getElementById('chat-prof-log');
+    const div = document.createElement('div');
+    div.className = `msg ${role}`;
+    div.innerText = text;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+    return div;
+}
+
+// Initializing
+window.addEventListener('load', () => {
+    const diagModal = document.getElementById("diag-modal");
+    if (diagModal) dragElement(diagModal);
+
+    const profInput = document.getElementById('input-prof');
+    if (profInput) {
+        profInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') askProfessor();
+        });
+    }
+});

@@ -352,9 +352,8 @@ button:disabled {
 #diag-modal {
     display: none;
     background: #222;
-    padding: 20px;
+    padding: 0; /* Remove padding to handle header properly */
     border: 2px solid #fff;
-    margin-top: 10px;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -365,13 +364,46 @@ button:disabled {
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
 }
 
+#diag-modal-header {
+    background: #444;
+    color: #fff;
+    padding: 10px;
+    cursor: move;
+    font-weight: bold;
+    font-size: 0.8rem;
+    border-bottom: 1px solid #555;
+    text-align: center;
+}
+
+#diag-modal > *:not(#diag-modal-header) {
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+#diag-modal h3 {
+    display: none; /* Removed in favor of header */
+}
+
 /* TELA 4: REPORT (OVERLAY) */
 #report-screen {
     background: rgba(0, 0, 0, 0.95);
+    display: none; /* Changed from default state to flex when active */
     justify-content: center;
     align-items: center;
     z-index: 200;
 }
+
+#report-screen.active {
+    display: flex;
+}
+
+#report-wrapper {
+    display: flex;
+    gap: 20px;
+    max-width: 95vw;
+    align-items: flex-start;
+}
+
 
 #report-paper {
     background: #f4f4f4;
@@ -444,14 +476,9 @@ h3 {
     width: 100%;
 }
 
-#diag-modal h3 {
-    color: white;
-    margin-top: 0;
-    border-bottom: 1px solid #555;
-    padding-bottom: 10px;
-}
-
 #diag-modal label {
+    display: block;
+    margin-top: 10px;
     color: #aaa;
     font-size: 0.8rem;
 }
@@ -487,6 +514,81 @@ h3 {
     font-size: 1.1rem;
 }
 
+/* Professor Chat */
+#professor-chat {
+    width: 350px;
+    height: 90vh;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+
+#chat-prof-header {
+    background: var(--accent-green);
+    color: #fff;
+    padding: 10px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+#chat-prof-log {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.msg {
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    max-width: 85%;
+    line-height: 1.4;
+}
+
+.msg.prof {
+    background: #2c3e50;
+    color: #ecf0f1;
+    align-self: flex-start;
+    border-left: 3px solid var(--accent-green);
+}
+
+.msg.user {
+    background: #2b3026;
+    color: var(--terminal-text);
+    align-self: flex-end;
+    border-right: 3px solid #555;
+    text-align: right;
+}
+
+#chat-prof-input-area {
+    padding: 10px;
+    background: #000;
+    display: flex;
+    gap: 5px;
+    border-top: 1px solid #333;
+}
+
+#chat-prof-input-area input {
+    flex: 1;
+    margin-bottom: 0;
+    font-size: 0.8rem;
+}
+
+#chat-prof-input-area button {
+    padding: 10px;
+    font-size: 0.7rem;
+    background: var(--accent-green);
+    color: #fff;
+    border: none;
+}
+
+
 @media (max-width: 768px) {
     body {
         overflow: auto;
@@ -521,5 +623,22 @@ h3 {
     .patient-sprite {
         margin-bottom: 0;
         /* Remove the negative margin that pulls it down */
+    }
+
+    #report-wrapper {
+        flex-direction: column;
+        align-items: center;
+        overflow-y: auto;
+        padding: 20px 0;
+    }
+
+    #report-paper, #professor-chat {
+        width: 90vw;
+        max-height: none;
+        height: auto;
+    }
+
+    #professor-chat {
+        height: 400px;
     }
 }
