@@ -352,7 +352,8 @@ button:disabled {
 #diag-modal {
     display: none;
     background: #222;
-    padding: 0; /* Remove padding to handle header properly */
+    padding: 0;
+    /* Remove padding to handle header properly */
     border: 2px solid #fff;
     position: absolute;
     top: 50%;
@@ -377,19 +378,21 @@ button:disabled {
     text-transform: uppercase;
 }
 
-#diag-modal > *:not(#diag-modal-header) {
+#diag-modal>*:not(#diag-modal-header) {
     margin-left: 15px;
     margin-right: 15px;
 }
 
 #diag-modal h3 {
-    display: none; /* Removed in favor of header */
+    display: none;
+    /* Removed in favor of header */
 }
 
 /* TELA 4: REPORT (OVERLAY) */
 #report-screen {
     background: rgba(0, 0, 0, 0.95);
-    display: none; /* Changed from default state to flex when active */
+    display: none;
+    /* Changed from default state to flex when active */
     justify-content: center;
     align-items: center;
     z-index: 200;
@@ -524,7 +527,7 @@ h3 {
     border: 1px solid #444;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 }
 
 #chat-prof-header {
@@ -634,7 +637,8 @@ h3 {
         padding: 20px 0;
     }
 
-    #report-paper, #professor-chat {
+    #report-paper,
+    #professor-chat {
         width: 90vw;
         max-height: none;
         height: auto;
