@@ -331,7 +331,8 @@ function initializeChatContext() {
                    - Não revele o diagnóstico, apenas sintomas.
 
                 2. O SISTEMA DE EXAMES / NARRADOR TÉCNICO:
-                   - ATIVADO QUANDO: O usuário pede exame, sinal vital, ou faz ação física (ex: "Palpar abdome").
+                   - ATIVADO APENAS quando o usuário pedir exame, sinal vital, ou faz ação física (ex: "Palpar abdome").
+                   - Não dê resultados não solicitados.
                    - REGRA DE OURO: SEJA EXTREMAMENTE CONCISO E TELEGRÁFICO.
                    - MÁXIMO 1-2 LINHAS. Use abreviações médicas padrão.
                    - IMPORTANTE: Para EXAMES DE SANGUE/LABORATORIAIS, você DEVE fornecer valores de referência (VR) abreviados ao lado dos resultados alterados ou relevantes. 
@@ -591,59 +592,59 @@ async function callGeminiChat(newMessage, modelName = MODEL_NAME) {
 
 // --- DRAGGABLE MODAL ---
 function dragElement(elmnt) {
-  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  const header = document.getElementById(elmnt.id + "-header");
-  if (header) {
-    // if present, the header is where you move the DIV from:
-    header.onmousedown = dragMouseDown;
-  } else {
-    // otherwise, move the DIV from anywhere inside the DIV:
-    elmnt.onmousedown = dragMouseDown;
-  }
-
-  function dragMouseDown(e) {
-    e = e || window.event;
-    e.preventDefault();
-    
-    // Fix: Convert initial CSS centering (top:50%, left:50%, transform:translate) 
-    // to actual pixel values before the first drag begins.
-    const style = window.getComputedStyle(elmnt);
-    if (style.transform !== "none") {
-        const rect = elmnt.getBoundingClientRect();
-        // Use offsetParent because top/left are relative to it
-        const parentRect = elmnt.offsetParent ? elmnt.offsetParent.getBoundingClientRect() : {top:0, left:0};
-        elmnt.style.top = (rect.top - parentRect.top) + "px";
-        elmnt.style.left = (rect.left - parentRect.left) + "px";
-        elmnt.style.transform = "none";
-        elmnt.style.position = "absolute"; // Ensure it's absolute for movement
+    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    const header = document.getElementById(elmnt.id + "-header");
+    if (header) {
+        // if present, the header is where you move the DIV from:
+        header.onmousedown = dragMouseDown;
+    } else {
+        // otherwise, move the DIV from anywhere inside the DIV:
+        elmnt.onmousedown = dragMouseDown;
     }
 
-    // get the mouse cursor position at startup:
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    document.onmouseup = closeDragElement;
-    // call a function whenever the cursor moves:
-    document.onmousemove = elementDrag;
-  }
+    function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
 
-  function elementDrag(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // calculate the new cursor position:
-    pos1 = pos3 - e.clientX;
-    pos2 = pos4 - e.clientY;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    // set the element's new position:
-    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-    elmnt.style.transform = "none";
-  }
+        // Fix: Convert initial CSS centering (top:50%, left:50%, transform:translate) 
+        // to actual pixel values before the first drag begins.
+        const style = window.getComputedStyle(elmnt);
+        if (style.transform !== "none") {
+            const rect = elmnt.getBoundingClientRect();
+            // Use offsetParent because top/left are relative to it
+            const parentRect = elmnt.offsetParent ? elmnt.offsetParent.getBoundingClientRect() : { top: 0, left: 0 };
+            elmnt.style.top = (rect.top - parentRect.top) + "px";
+            elmnt.style.left = (rect.left - parentRect.left) + "px";
+            elmnt.style.transform = "none";
+            elmnt.style.position = "absolute"; // Ensure it's absolute for movement
+        }
 
-  function closeDragElement() {
-    document.onmouseup = null;
-    document.onmousemove = null;
-  }
+        // get the mouse cursor position at startup:
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        // call a function whenever the cursor moves:
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // calculate the new cursor position:
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        // set the element's new position:
+        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        elmnt.style.transform = "none";
+    }
+
+    function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
 }
 
 // --- PROFESSOR CHAT ---
@@ -656,14 +657,14 @@ async function askProfessor() {
     input.value = '';
 
     const profPrompt = `
-        Aja como um Professor de Medicina experiente, rigoroso mas didático. 
+        Aja como um Professor de Medicina experiente. 
         O aluno recebeu uma auditoria e quer tirar dúvidas.
         DADOS DO CASO:
         - Diagnóstico: ${currentCase.hidden_truth.diagnostico}
         - Fisiopatologia: ${currentCase.hidden_truth.fisiopatologia}
         - Conduta: ${currentCase.hidden_truth.conduta}
         DÚVIDA DO ALUNO: "${text}"
-        Responda como o Professor em no máximo 2 parágrafos.
+        Responda de forma objetiva e direta em formato de texto ou tópicos, sem elementos markdown.
     `;
 
     try {
