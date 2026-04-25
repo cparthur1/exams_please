@@ -290,7 +290,7 @@ async function generateNewCase() {
         `;
 
     try {
-        const result = await callGeminiAPI(prompt, true);
+        const result = await callGeminiAPI(prompt, true, "gemini-flash-latest");
         const cleanJson = result.replace(/```json/g, '').replace(/```/g, '').trim();
         currentCase = JSON.parse(cleanJson);
 
@@ -373,7 +373,7 @@ async function performAction() {
     const userMessage = `Ação do Médico: "${action}". Justificativa: "${just}".`;
 
     try {
-        const response = await callGeminiChat(userMessage);
+        const response = await callGeminiChat(userMessage, "gemini-flash-lite-latest");
         addLog(response, 'sys');
 
         if (response.length < 200 && !response.match(/exame|resultado|vr|referência/i)) {
@@ -440,7 +440,7 @@ async function submitCase() {
     `;
 
     try {
-        const report = await callGeminiAPI(evaluationPrompt, false);
+        const report = await callGeminiAPI(evaluationPrompt, false, "gemini-flash-latest");
         const cleanReport = report.replace(/```html/g, '').replace(/```/g, '');
         document.getElementById('report-content').innerHTML = cleanReport;
         printerSound.play();
@@ -509,8 +509,8 @@ async function fetchWithRetry(url, options, retries = 3) {
     }
 }
 
-async function callGeminiAPI(prompt, isJsonMode) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
+async function callGeminiAPI(prompt, isJsonMode, modelName = MODEL_NAME) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
     let body = { contents: [{ parts: [{ text: prompt }] }] };
 
@@ -567,8 +567,8 @@ async function callGeminiAPI(prompt, isJsonMode) {
     }
 }
 
-async function callGeminiChat(newMessage) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
+async function callGeminiChat(newMessage, modelName = MODEL_NAME) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
     chatHistory.push({ role: "user", parts: [{ text: newMessage }] });
     const body = { contents: chatHistory };
@@ -668,7 +668,7 @@ async function askProfessor() {
 
     try {
         const typingDiv = addProfChatMessage("O professor está escrevendo...", 'prof');
-        const response = await callGeminiAPI(profPrompt, false);
+        const response = await callGeminiAPI(profPrompt, false, "gemini-flash-lite-latest");
         typingDiv.remove();
         addProfChatMessage(response, 'prof');
     } catch (e) {
