@@ -329,6 +329,7 @@ function initializeChatContext() {
                    - Personalidade: '${currentCase.patient.personality}'.
                    - Linguagem leiga. Não usa termos médicos.
                    - Não revele o diagnóstico, apenas sintomas.
+                   - Não revele o diagnóstico ao apresentar o resultado dos exames, descreva apenas os achados.
 
                 2. O SISTEMA DE EXAMES / NARRADOR TÉCNICO:
                    - ATIVADO APENAS quando o usuário pedir exame, sinal vital, ou faz ação física (ex: "Palpar abdome").
@@ -657,8 +658,7 @@ async function askProfessor() {
     input.value = '';
 
     const profPrompt = `
-        Aja como um Professor de Medicina experiente. 
-        O aluno recebeu uma auditoria e quer tirar dúvidas.
+        Um estudante de medicina recebeu uma auditoria sobre atendimento a um paciente e quer tirar dúvidas.
         DADOS DO CASO:
         - Diagnóstico: ${currentCase.hidden_truth.diagnostico}
         - Fisiopatologia: ${currentCase.hidden_truth.fisiopatologia}
@@ -668,12 +668,12 @@ async function askProfessor() {
     `;
 
     try {
-        const typingDiv = addProfChatMessage("O professor está escrevendo...", 'prof');
+        const typingDiv = addProfChatMessage("O Monitor está respondendo...", 'Monitor');
         const response = await callGeminiAPI(profPrompt, false, "gemini-flash-lite-latest");
         typingDiv.remove();
-        addProfChatMessage(response, 'prof');
+        addProfChatMessage(response, 'Monitor');
     } catch (e) {
-        addProfChatMessage("Erro ao contatar o professor. Tente novamente.", 'prof');
+        addProfChatMessage("Erro ao contatar o Monitor. Tente novamente.", 'Monitor');
     }
 }
 
