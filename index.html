@@ -179,6 +179,50 @@
         </div>
     </div>
 
+    <!-- MODAL: ERRO 429 (COTA ESGOTADA) -->
+    <div id="quota-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal-btn" onclick="closeQuotaModal()">&times;</button>
+            <h2 style="color: var(--accent-red);">LIMITE DE COTAS ATINGIDO</h2>
+            <div class="instruction-steps">
+                <div class="step">
+                    <p>Sua cota gratuita diária do Gemini API chegou ao fim ou você atingiu o limite de requisições por minuto.</p>
+                    <p>Você pode aguardar alguns minutos (se for limite por minuto) ou até amanhã para que a cota seja resetada.</p>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button onclick="openPaidApiModal()" class="modal-btn-primary">ATIVAR API PAGA</button>
+                <button onclick="closeQuotaModal()" class="modal-btn-secondary">VOLTAR DEPOIS</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ATIVAR API PAGA -->
+    <div id="paid-api-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal-btn" onclick="closePaidApiModal()">&times;</button>
+            <h2>ATIVAR FATURAMENTO (PAY-AS-YOU-GO)</h2>
+            
+            <div class="instruction-steps">
+                <div class="step">
+                    <p>Ao ativar o faturamento (billing) no Google AI Studio, você remove as restrições da cota gratuita e paga apenas pelo que usar.</p>
+                    <img src="API_instructions/instruction4.png" alt="Configurar Faturamento" style="border: 2px solid var(--accent-green);">
+                </div>
+                <div class="step" style="background: #1a1a1a; padding: 15px; border-left: 4px solid var(--accent-green);">
+                    <p><strong>Custo Estimado por Partida:</strong></p>
+                    <p style="font-size: 0.8rem; color: #aaa;">Considerando geração de caso, 10 perguntas ao paciente, relatório final e 3 dúvidas ao monitor:</p>
+                    <p style="font-size: 1.2rem; color: #fff; margin: 10px 0;"><strong>Aprox. $0.02 USD</strong> <span style="font-size: 0.8rem; color: #888;">(dois centavos de dólar)</span></p>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <a href="https://aistudio.google.com/app/api-keys" target="_blank" class="modal-btn-primary">CONFIGURAR EM GOOGLE AI STUDIO</a>
+                <button onclick="closePaidApiModal()" class="modal-btn-secondary">FECHAR</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 

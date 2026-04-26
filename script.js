@@ -489,6 +489,11 @@ async function fetchWithRetry(url, options, retries = 3) {
         try {
             const response = await fetch(url, options);
 
+            if (response.status === 429) {
+                openQuotaModal();
+                throw new Error("HTTP 429: Quota Exceeded");
+            }
+
             if (response.status === 400) {
                 const errText = await response.text();
                 console.error("API 400 Error:", errText);
@@ -717,10 +722,35 @@ function closeApiModal() {
     if (modal) modal.classList.remove('active');
 }
 
-// Close modal when clicking outside
+// --- MODAIS ADICIONAIS (QUOTA / PAID) ---
+function openQuotaModal() {
+    const modal = document.getElementById('quota-modal');
+    if (modal) modal.classList.add('active');
+}
+
+function closeQuotaModal() {
+    const modal = document.getElementById('quota-modal');
+    if (modal) modal.classList.remove('active');
+}
+
+function openPaidApiModal() {
+    closeQuotaModal();
+    const modal = document.getElementById('paid-api-modal');
+    if (modal) modal.classList.add('active');
+}
+
+function closePaidApiModal() {
+    const modal = document.getElementById('paid-api-modal');
+    if (modal) modal.classList.remove('active');
+}
+
+// Close modals when clicking outside
 window.addEventListener('click', (event) => {
-    const modal = document.getElementById('api-modal');
-    if (event.target === modal) {
-        closeApiModal();
-    }
+    const apiModal = document.getElementById('api-modal');
+    const quotaModal = document.getElementById('quota-modal');
+    const paidModal = document.getElementById('paid-api-modal');
+
+    if (event.target === apiModal) closeApiModal();
+    if (event.target === quotaModal) closeQuotaModal();
+    if (event.target === paidModal) closePaidApiModal();
 });
