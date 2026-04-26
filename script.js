@@ -705,3 +705,22 @@ if (document.readyState === 'loading') {
 } else {
     initExamsDraggables();
 }
+
+// --- MODAL API ---
+function openApiModal() {
+    const modal = document.getElementById('api-modal');
+    if (modal) modal.classList.add('active');
+}
+
+function closeApiModal() {
+    const modal = document.getElementById('api-modal');
+    if (modal) modal.classList.remove('active');
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', (event) => {
+    const modal = document.getElementById('api-modal');
+    if (event.target === modal) {
+        closeApiModal();
+    }
+});

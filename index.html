@@ -40,21 +40,18 @@
 
             <input type="password" id="api-key-input" placeholder="Cole sua API Key aqui">
             <button onclick="startShift()">INICIAR PLANTÃO</button>
-            <button onclick="startTestShift()"
-                style="background: #444; color: #ccc; border-color: #555; font-size: 0.7rem; margin-top: -10px;">ENTRAR
-                EM MODO TESTE (SEM API KEY)</button>
-
-            <a href="https://aistudio.google.com/api-keys" target="_blank" class="api-link">Não tenho chave da API
+            <a onclick="openApiModal()" class="api-link">Não tenho chave da API
                 (Gerar Grátis)</a>
 
-            <div class="db-upload">
-                <label>BANCO DE CASOS (OPCIONAL):</label>
+            <div class="db-section">
+                <h3>BANCO DE CASOS CUSTOMIZADO</h3>
+                <p class="db-help">Para treinar casos específicos, carregue um arquivo <strong>.txt</strong> com um nome de doença por linha.</p>
                 <div class="file-input-wrapper">
-                    <button class="custom-file-btn" id="file-btn-text">USAR BANCO PADRÃO (REPOSITÓRIO)</button>
+                    <button class="custom-file-btn" id="file-btn-text">SELECIONAR ARQUIVO (.TXT)</button>
                     <input type="file" id="db-file-input" accept=".json,.txt">
                 </div>
-                <div id="db-filename" class="db-status">Nenhum arquivo customizado selecionado.</div>
-                <a onclick="resetDefaultDB()" id="reset-db" class="reset-link">Voltar para o banco padrão</a>
+                <div id="db-filename" class="db-status">Usando banco padrão do sistema.</div>
+                <a onclick="resetDefaultDB()" id="reset-db" class="reset-link">RESTAURAR BANCO PADRÃO</a>
             </div>
 
             <p class="model-info">Modelo: gemini-flash-latest</p>
@@ -154,17 +151,34 @@
         </div>
     </div>
 
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(registration => {
-                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                }, err => {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
-            });
-        }
-    </script>
+    <!-- MODAL: INSTRUÇÕES API -->
+    <div id="api-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal-btn" onclick="closeApiModal()">&times;</button>
+            <h2>COMO GERAR SUA API KEY</h2>
+            
+            <div class="instruction-steps">
+                <div class="step">
+                    <p>1. Acesse o <strong>Google AI Studio</strong> e clique em <strong>"Get API key"</strong> no menu lateral.</p>
+                    <img src="API_instructions/instruction1.png" alt="Passo 1">
+                </div>
+                <div class="step">
+                    <p>2. Clique no botão <strong>"Create API key in new project"</strong>.</p>
+                    <img src="API_instructions/instruction2.png" alt="Passo 2">
+                </div>
+                <div class="step">
+                    <p>3. <strong>Copie a chave</strong> gerada e cole no campo de login do simulador.</p>
+                    <img src="API_instructions/instruction3.png" alt="Passo 3">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <a href="https://aistudio.google.com/api-keys" target="_blank" class="modal-btn-primary">ABRIR GOOGLE AI STUDIO</a>
+                <button onclick="closeApiModal()" class="modal-btn-secondary">ENTENDI</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 

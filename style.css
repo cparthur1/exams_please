@@ -68,17 +68,30 @@ body {
     color: #fff;
 }
 
-.db-upload {
-    margin-top: 10px;
+.db-section {
+    margin-top: 20px;
+    padding: 15px;
+    background: #0a0a0a;
+    border: 1px solid #333;
     text-align: left;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 8px;
+    border-radius: 4px;
 }
 
-.db-upload label {
+.db-section h3 {
     font-size: 0.8rem;
-    color: #aaa;
+    margin: 0;
+    color: var(--accent-green);
+    letter-spacing: 1px;
+}
+
+.db-help {
+    font-size: 0.7rem;
+    color: #888;
+    line-height: 1.4;
+    margin: 0;
 }
 
 .file-input-wrapper {
@@ -594,6 +607,102 @@ h3 {
 }
 
 
+/* --- MODAIS GENÉRICOS --- */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background: #111;
+    border: 2px solid var(--accent-green);
+    padding: 30px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 0 30px rgba(51, 255, 0, 0.1);
+    color: #eee;
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    color: #666;
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close-modal-btn:hover {
+    color: #fff;
+    background: transparent;
+}
+
+.instruction-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin: 20px 0;
+}
+
+.step p {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    color: #ccc;
+}
+
+.step img {
+    width: 100%;
+    border: 1px solid #444;
+    border-radius: 4px;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-btn-primary {
+    flex: 2;
+    background: var(--accent-green);
+    color: #fff;
+    text-decoration: none;
+    text-align: center;
+    padding: 12px;
+    font-weight: bold;
+    font-size: 0.8rem;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-btn-secondary {
+    flex: 1;
+    background: #222;
+    color: #aaa;
+    border: 1px solid #444;
+}
+
 @media (max-width: 768px) {
     body {
         overflow: auto;
@@ -646,5 +755,10 @@ h3 {
 
     #professor-chat {
         height: 400px;
+    }
+
+    .modal-content {
+        padding: 20px;
+        width: 95%;
     }
 }
